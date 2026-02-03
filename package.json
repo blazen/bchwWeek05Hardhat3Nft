@@ -1,0 +1,36 @@
+{
+  "name": "bchwWeek05Hardhat3Nft",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:coverage": "hardhat test --coverage",
+    "test:coverage:report": "hardhat test --coverage --report html",
+    "test:gas": "REPORT_GAS=true hardhat test",
+    "deploy:local": "hardhat ignition deploy ignition/modules/Crowdfunding.ts --network localhost",
+    "deploy:sepolia": "hardhat ignition deploy ignition/modules/Crowdfunding.ts --network sepolia",
+    "node": "hardhat node",
+    "clean": "hardhat clean"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^4.0.4",
+    "@nomicfoundation/hardhat-ignition": "^3.0.7",
+    "@nomicfoundation/hardhat-toolbox-mocha-ethers": "^3.0.2",
+    "@types/chai": "^4.3.20",
+    "@types/chai-as-promised": "^8.0.2",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.19.7",
+    "chai": "^5.3.3",
+    "ethers": "^6.16.0",
+    "forge-std": "github:foundry-rs/forge-std#v1.9.4",
+    "hardhat": "^3.1.6",
+    "mocha": "^11.7.5",
+    "typescript": "~5.8.0"
+  },
+  "type": "module"
+}
