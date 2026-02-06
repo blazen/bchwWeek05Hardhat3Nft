@@ -20,7 +20,7 @@ contract MetaNFTAuctionV1 {
 
     /// @dev 逻辑合约地址
     address public implementation;
-//    string public version;
+    string public version;
 
     /// @dev 拍卖合约管理员
     address admin;
@@ -103,6 +103,7 @@ contract MetaNFTAuctionV1 {
     constructor() {
 //        _disableInitializers();
         admin = msg.sender;
+//        version = "V1";
     }
 
 //    function initialize(address admin_) external initializer {
@@ -392,6 +393,10 @@ contract MetaNFTAuctionV1 {
 //    }
     function getVersion() external pure returns(string memory) {
         return "MetaNFTAuctionV1";
+    }
+
+    function setVersion() external {
+        version = "MetaNFTAuctionV1";
     }
 
 //    function getVersionNumber() external pure returns (uint256) {

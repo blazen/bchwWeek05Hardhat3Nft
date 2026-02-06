@@ -15,7 +15,7 @@ import "./v1/String.sol";
  * @notice 本合约管理单个拍卖的完整生命周期，状态流转如下：准备中(Preparing) -> 拍卖中(Active) -> 成功(Success)/失败(Failed) -> 已关闭(Closed)/已退款(Refunded)
  */
 //contract MetaNFTAuction is Initializable {
-contract MetaNFTAuctionV2 {
+contract MetaNFTAuctionV1 {
     using Strings for uint256; // 使用Strings库，
 
     /// @dev 逻辑合约地址
@@ -29,7 +29,7 @@ contract MetaNFTAuctionV2 {
     enum State {
         /// @dev 准备中：拍卖已创建但尚未开始
         Preparing,
-       /// @dev 拍卖中：拍卖中
+        /// @dev 拍卖中：拍卖中
         Active,
         /// @dev 成功：拍卖成功（拍卖者可以提取金额，竞拍者可以提起NFT）
         Success,
@@ -43,7 +43,7 @@ contract MetaNFTAuctionV2 {
     struct Auction {
         /// @dev 拍卖状态：true 结束，false 拍卖中
         bool end;
-         /// @dev 中标者是否已提取 NFT
+        /// @dev 中标者是否已提取 NFT
         bool highestWithdrawed;
         /// @dev 拍卖者是否已提款
         bool sellerWithdrawed;
@@ -103,6 +103,7 @@ contract MetaNFTAuctionV2 {
     constructor() {
 //        _disableInitializers();
         admin = msg.sender;
+//        version = "V1";
     }
 
 //    function initialize(address admin_) external initializer {
@@ -128,7 +129,7 @@ contract MetaNFTAuctionV2 {
         address paymentToken
     ) external onlyAdmin {
         require(nft != address(0), "invalid nft");
-        require(duration >= 30, "duration is 0-30 days");
+        require(duration >= 120, "duration is greater than 120 second");
         require(paymentToken != address(0), "invalid payment token");
         auctions[auctionId] = Auction({
             end: false,
@@ -207,7 +208,7 @@ contract MetaNFTAuctionV2 {
      */
     function bid(uint256 auctionId_) external payable {
         Auction storage auction = auctions[auctionId_];
-        // 竞拍者授权合约的额度
+        // 竞拍者授权合约的 token 额度
         uint256 allowance = auction.paymentToken.allowance(msg.sender, address(this));
         require(msg.value > 0 || allowance > 0, string.concat("invalid bid, eth:", msg.value.toString(), ", usdc:", allowance.toString()));
         emit BidERC20(msg.value, allowance);
@@ -359,10 +360,10 @@ contract MetaNFTAuctionV2 {
      */
     function getPriceInDollar(uint256 bidMethod) public pure returns (uint256) {
         if (bidMethod == 1) {
-            // eth
+            // eth, 2289.12$, 1000$ = 0.5
             return uint256(228912670662);
         } else {
-            // usdc 6 decimal, 1USDC = 99971000 = 99.971
+            // usdc，0.99$, 1000$ = 1001
             return uint256(99971000);
         }
     }
@@ -380,10 +381,27 @@ contract MetaNFTAuctionV2 {
 
     // 函数选择器 0xb88da759
     // _addr.call{value: msg.value}(abi.encodeWithSignature("getVersion(uint256)", 99));
-    function getVersion(uint256 key) external returns (string memory) {
-        version = string.concat("MetaNFTAuctionV2:", key.toString());
-        return "MetaNFTAuctionV1";
+//    function getVersion(uint256 key) external returns (string memory) {
+//        version = string.concat("MetaNFTAuctionV1:", key.toString());
+//        return "MetaNFTAuctionV1";
+//    }
+//    function getVersion(uint256 key) external {
+//        version = string.concat("MetaNFTAuctionV1:", key.toString());
+//    }
+//    function getVersion(uint256 key) external pure returns(string memory) {
+//        return string.concat("MetaNFTAuctionV1:", key.toString());
+//    }
+    function getVersion() external pure returns(string memory) {
+        return "MetaNFTAuctionV2";
     }
+
+    function setVersion() external {
+        version = "MetaNFTAuctionV2";
+    }
+
+//    function getVersionNumber() external pure returns (uint256) {
+//        return 1;
+//    }
 
     // 升级函数，改变逻辑合约地址，只能由admin调用。选择器：0x0900f010
     // UUPS中，逻辑函数中必须包含升级函数，不然就不能再升级了。

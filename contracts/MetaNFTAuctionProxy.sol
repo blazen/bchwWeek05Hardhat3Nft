@@ -83,6 +83,8 @@ contract MetaNFTAuctionProxy {
     /// UUPS PROXY
     event CallSuccess(bytes data);
     event CallFail(bytes data);
+    event receivedCalled(address indexed Sender, uint Value);
+    event fallbackCalled(address indexed Sender, uint Value, bytes Data);
 
     /// @dev 构造函数，初始化admin和逻辑合约地址
     constructor(address _implementation){
@@ -90,16 +92,68 @@ contract MetaNFTAuctionProxy {
         implementation = _implementation;
     }
 
-    receive() external payable {}
+    receive() external payable {
+        emit receivedCalled(msg.sender, msg.value);
+    }
 
     /// @dev fallback函数，将调用委托给逻辑合约
     fallback() external payable {
+        emit fallbackCalled(msg.sender, msg.value, msg.data);
+//        _delegate1();
+        _delegate2();
+    }
+
+    function _delegate1() internal {
         (bool success, bytes memory data) = implementation.delegatecall(msg.data);
         if(success){
             emit CallSuccess(data);
         } else {
             emit CallFail(data);
         }
+    }
+
+    /**
+     * @dev 将调用委托给逻辑合约运行
+     */
+    function _delegate2() internal {
+        // 内联汇编（inline assembly）
+        // calldatacopy(t, f, s)：将calldata（输入数据）从位置f开始复制s字节到mem（内存）的位置t。
+        // delegatecall(g, a, in, insize, out, outsize)：调用地址a的合约，输入为mem[in..(in+insize)) ，输出为mem[out..(out+outsize))， 提供gwei的以太坊gas。这个操作码在错误时返回0，在成功时返回1。
+        // returndatacopy(t, f, s)：将returndata（输出数据）从位置f开始复制s字节到mem（内存）的位置t。
+        // switch：基础版if/else，不同的情况case返回不同值。可以有一个默认的default情况。
+        // return(p, s)：终止函数执行, 返回数据mem[p..(p+s))。
+        // revert(p, s)：终止函数执行, 回滚状态，返回数据mem[p..(p+s))。
+        assembly {
+            // Copy msg.data. We take full control of memory in this inline assembly
+            // block because it will not return to Solidity code. We overwrite the
+            // 读取位置为0的storage，也就是implementation地址。
+            let _implementation := sload(0)
+
+            calldatacopy(0, 0, calldatasize())
+
+            // 利用delegatecall调用implementation合约
+            // delegatecall操作码的参数分别为：gas, 目标合约地址，input mem起始位置，input mem长度，output area mem起始位置，output area mem长度
+            // output area起始位置和长度位置，所以设为0
+            // delegatecall成功返回1，失败返回0
+            let result := delegatecall(gas(), _implementation, 0, calldatasize(), 0, 0)
+
+            // 将起始位置为0，长度为returndatasize()的returndata复制到mem位置0
+            returndatacopy(0, 0, returndatasize())
+
+            switch result
+            // 如果delegate call失败，revert
+            case 0 {
+                revert(0, returndatasize())
+            }
+            // 如果delegate call成功，返回mem起始位置为0，长度为returndatasize()的数据（格式为bytes）
+            default {
+                return(0, returndatasize())
+            }
+        }
+    }
+
+    function inc(uint256 a, uint256 b) external pure returns(uint){
+        return a+b;
     }
 
 }
