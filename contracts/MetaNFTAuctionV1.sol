@@ -20,7 +20,7 @@ contract MetaNFTAuctionV1 {
 
     /// @dev 逻辑合约地址
     address public implementation;
-    string public version;
+//    string public version;
 
     /// @dev 拍卖合约管理员
     address admin;
@@ -128,7 +128,7 @@ contract MetaNFTAuctionV1 {
         address paymentToken
     ) external onlyAdmin {
         require(nft != address(0), "invalid nft");
-        require(duration >= 30, "duration is 0-30 days");
+        require(duration >= 120, "duration is greater than 120 second");
         require(paymentToken != address(0), "invalid payment token");
         auctions[auctionId] = Auction({
             end: false,
@@ -207,7 +207,7 @@ contract MetaNFTAuctionV1 {
      */
     function bid(uint256 auctionId_) external payable {
         Auction storage auction = auctions[auctionId_];
-        // 竞拍者授权合约的额度
+        // 竞拍者授权合约的 token 额度
         uint256 allowance = auction.paymentToken.allowance(msg.sender, address(this));
         require(msg.value > 0 || allowance > 0, string.concat("invalid bid, eth:", msg.value.toString(), ", usdc:", allowance.toString()));
         emit BidERC20(msg.value, allowance);
@@ -359,10 +359,10 @@ contract MetaNFTAuctionV1 {
      */
     function getPriceInDollar(uint256 bidMethod) public pure returns (uint256) {
         if (bidMethod == 1) {
-            // eth
+            // eth, 2289.12$, 1000$ = 0.5
             return uint256(228912670662);
         } else {
-            // usdc 6 decimal, 1USDC = 99971000 = 99.971
+            // usdc，0.99$, 1000$ = 1001
             return uint256(99971000);
         }
     }
@@ -380,10 +380,23 @@ contract MetaNFTAuctionV1 {
 
     // 函数选择器 0xb88da759
     // _addr.call{value: msg.value}(abi.encodeWithSignature("getVersion(uint256)", 99));
-    function getVersion(uint256 key) external returns (string memory) {
-        version = string.concat("MetaNFTAuctionV1:", key.toString());
+//    function getVersion(uint256 key) external returns (string memory) {
+//        version = string.concat("MetaNFTAuctionV1:", key.toString());
+//        return "MetaNFTAuctionV1";
+//    }
+//    function getVersion(uint256 key) external {
+//        version = string.concat("MetaNFTAuctionV1:", key.toString());
+//    }
+//    function getVersion(uint256 key) external pure returns(string memory) {
+//        return string.concat("MetaNFTAuctionV1:", key.toString());
+//    }
+    function getVersion() external pure returns(string memory) {
         return "MetaNFTAuctionV1";
     }
+
+//    function getVersionNumber() external pure returns (uint256) {
+//        return 1;
+//    }
 
     // 升级函数，改变逻辑合约地址，只能由admin调用。选择器：0x0900f010
     // UUPS中，逻辑函数中必须包含升级函数，不然就不能再升级了。

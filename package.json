@@ -6,6 +6,8 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
+    "test:solidity": "hardhat test solidity",
+    "test:auction": "hardhat test test/MetaNFTAuctionV1Test.ts",
     "test:coverage": "hardhat test --coverage",
     "test:coverage:report": "hardhat test --coverage --report html",
     "test:gas": "REPORT_GAS=true hardhat test",

@@ -10,6 +10,7 @@ import {Test} from "forge-std/Test.sol";
 contract CounterTest is Test {
   Counter counter;
 
+  // is called before each test execution
   function setUp() public {
     counter = new Counter();
   }
@@ -25,8 +26,15 @@ contract CounterTest is Test {
     require(counter.x() == x, "Value after calling inc x times should be x");
   }
 
+  function test_IncEmitsIncrementEvent() public {
+    vm.expectEmit();    // cheatcodes 将会发生事件
+    emit Counter.Increment(1);  // 事件类型与参数必须与此相同
+
+    counter.inc();    // 发生上诉事件
+  }
+
   function test_IncByZero() public {
-    vm.expectRevert();
+    vm.expectRevert();    // 将会回滚，因为参数为0
     counter.incBy(0);
   }
 }
