@@ -1,21 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import "./v1/ERC721.sol";
-//import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-//import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
-import "./v1/String.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
  * @title NFT拍卖合约
  * @dev 使用状态机模式的单个NFT拍卖合约
  * @notice 本合约管理单个拍卖的完整生命周期，状态流转如下：准备中(Preparing) -> 拍卖中(Active) -> 成功(Success)/失败(Failed) -> 已关闭(Closed)/已退款(Refunded)
  */
-//contract MetaNFTAuction is Initializable {
-contract MetaNFTAuctionV2 {
+contract OpzNFTAuctionV1 is Initializable {
     using Strings for uint256; // 使用Strings库，
 
     /// @dev 逻辑合约地址
@@ -29,7 +27,7 @@ contract MetaNFTAuctionV2 {
     enum State {
         /// @dev 准备中：拍卖已创建但尚未开始
         Preparing,
-        /// @dev 拍卖中：拍卖中
+       /// @dev 拍卖中：拍卖中
         Active,
         /// @dev 成功：拍卖成功（拍卖者可以提取金额，竞拍者可以提起NFT）
         Success,
@@ -43,7 +41,7 @@ contract MetaNFTAuctionV2 {
     struct Auction {
         /// @dev 拍卖状态：true 结束，false 拍卖中
         bool end;
-        /// @dev 中标者是否已提取 NFT
+         /// @dev 中标者是否已提取 NFT
         bool highestWithdrawed;
         /// @dev 拍卖者是否已提款
         bool sellerWithdrawed;
@@ -101,15 +99,14 @@ contract MetaNFTAuctionV2 {
     }
     // 初始化
     constructor() {
-//        _disableInitializers();
-        admin = msg.sender;
-//        version = "V1";
+        // 确保只能通过代理调用
+        _disableInitializers();
     }
 
-//    function initialize(address admin_) external initializer {
-//        require(admin_ != address(0), "invalid admin");
-//        admin = admin_;
-//    }
+    function initialize(address admin_) external initializer {
+        require(admin_ != address(0), "invalid admin");
+        admin = admin_;
+    }
 
     /**
      * @dev 管理员发起拍卖（管理员从其它方式收到拍品信息）
@@ -392,11 +389,11 @@ contract MetaNFTAuctionV2 {
 //        return string.concat("MetaNFTAuctionV1:", key.toString());
 //    }
     function getVersion() external pure returns(string memory) {
-        return "MetaNFTAuctionV2";
+        return "MetaNFTAuctionV1";
     }
 
     function setVersion() external {
-        version = "MetaNFTAuctionV2";
+        version = "MetaNFTAuctionV1";
     }
 
 //    function getVersionNumber() external pure returns (uint256) {

@@ -24,6 +24,10 @@ export default defineConfig({
         },
       },
     },
+    npmFilesToBuild: [
+      "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol",
+      "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol",
+    ],
   },
   networks: {
     hardhatMainnet: {
