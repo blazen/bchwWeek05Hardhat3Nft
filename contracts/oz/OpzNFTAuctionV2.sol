@@ -5,6 +5,8 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
@@ -12,16 +14,16 @@ import "@openzeppelin/contracts/utils/Strings.sol";
  * @title NFT拍卖合约
  * @dev 使用状态机模式的单个NFT拍卖合约
  * @notice 本合约管理单个拍卖的完整生命周期，状态流转如下：准备中(Preparing) -> 拍卖中(Active) -> 成功(Success)/失败(Failed) -> 已关闭(Closed)/已退款(Refunded)
+ * @notice 继承 Initializable 实现 initialize。构造函数中调用 _disableInitializers(); 确保逻辑合约只能通过代理调用。
+ * @notice 继承 UUPSUpgradeable 实现 _authorizeUpgrade 添加 onlyOwner，仅支持管理员升级。以便在 @openzeppelin/contracts-upgradeable 支持 hardhat3 后部署升级。
+ * @notice The @openzeppelin/hardhat-upgrades plugin (v3.9.1) is currently incompatible with Hardhat v3.0.6
  */
-contract OpzNFTAuctionV1 is Initializable {
+contract OpzNFTAuctionV1 is
+    Initializable,
+    UUPSUpgradeable,
+    OwnableUpgradeable
+{
     using Strings for uint256; // 使用Strings库，
-
-    /// @dev 逻辑合约地址
-    address public implementation;
-    string public version;
-
-    /// @dev 拍卖合约管理员
-    address admin;
 
     /// @dev 拍卖状态：定义拍卖所有可能的状态
     enum State {
@@ -91,21 +93,13 @@ contract OpzNFTAuctionV1 is Initializable {
     /// TEST
     event BidERC20(uint256 eth, uint256 usdc);
 
-    /// @dev 修饰符定义
-    /// @notice 仅管理员修饰符
-    modifier onlyAdmin() {
-        require(msg.sender == admin, "not admin");
-        _;
-    }
     // 初始化
     constructor() {
         // 确保只能通过代理调用
         _disableInitializers();
     }
 
-    function initialize(address admin_) external initializer {
-        require(admin_ != address(0), "invalid admin");
-        admin = admin_;
+    function initialize() external initializer {
     }
 
     /**
@@ -124,7 +118,7 @@ contract OpzNFTAuctionV1 is Initializable {
         uint256 startingPriceInDollar,
         uint256 duration,
         address paymentToken
-    ) external onlyAdmin {
+    ) external onlyOwner {
         require(nft != address(0), "invalid nft");
         require(duration >= 120, "duration is greater than 120 second");
         require(paymentToken != address(0), "invalid payment token");
@@ -146,57 +140,6 @@ contract OpzNFTAuctionV1 is Initializable {
         });
         auctionId++;
         emit StartBid(auctionId);
-    }
-
-    /**
-     * @dev 买家竞价
-     * @param auctionId_ 竞价的拍品
-     */
-    function bidEth(uint256 auctionId_) external payable {
-        Auction storage auction = auctions[auctionId_];
-        // 竞拍者授权合约的额度
-        // uint256 allowance = auction.paymentToken.allowance(msg.sender, address(this));
-        // require(msg.value > 0 || allowance > 0, "invalid bid");
-        require(msg.value > 0, "invalid bid");
-        // 竞拍者只能选择一种支付方式：ETH 或者 token
-        // require((msg.value > 0) != (allowance > 0), "only one of ETH or token");
-        require(auction.startingTime > 0, "not started");
-        require(!auction.end, "ended");
-        require(block.timestamp < auction.startingTime + auction.duration, "ended");
-
-        uint256 bidMethod = 1;
-        uint256 bidPrice;
-
-        // 计算兑换当前美元价格，1ETH = ？$
-        uint256 price = getPriceInDollar(1);
-        bidPrice = _toUsd(msg.value, 18, price);
-        auction.highestBid = msg.value;
-
-        require(auction.startingPriceInDollar < bidPrice, string.concat("invalid bid price:", bidPrice.toString()));
-        require(auction.highestBidInDollar < bidPrice, string.concat("invalid bid price:", bidPrice.toString()));
-        auction.highestBidder = msg.sender;
-        auction.highestBidInDollar = bidPrice;
-        emit Bid(msg.sender, msg.value, bidMethod);
-    }
-
-    function bidERC20(uint256 auctionId_) external payable {
-        Auction storage auction = auctions[auctionId_];
-        // 竞拍者授权合约的额度
-        uint256 allowance = auction.paymentToken.allowance(msg.sender, address(this));
-        require(msg.value > 0 || allowance > 0, "invalid bid");
-        emit BidERC20(msg.value, allowance);
-
-        // 竞拍者只能选择一种支付方式：ETH 或者 token
-        // require((msg.value > 0) != (allowance > 0), "only one of ETH or token");
-        require(auction.startingTime > 0, "not started");
-        require(!auction.end, "ended");
-        require(block.timestamp < auction.startingTime + auction.duration, "ended");
-
-        // 计算兑换当前美元价格，1USDC = ？$
-        uint256 price = getPriceInDollar(2);
-        uint8 tokenDecimals = IERC20Metadata(address(auction.paymentToken)).decimals();
-        uint256 bidPrice = _toUsd(allowance, tokenDecimals, price);
-        emit BidERC20(bidPrice, allowance);
     }
 
     /**
@@ -320,7 +263,7 @@ contract OpzNFTAuctionV1 is Initializable {
     /**
      * @dev 结束拍卖
      */
-    function endBidding(uint256 auctionId_) external onlyAdmin{
+    function endBidding(uint256 auctionId_) external onlyOwner{
         Auction storage auction = auctions[auctionId_];
         require(!auction.end, "ended");
         auction.end = true;
@@ -376,35 +319,11 @@ contract OpzNFTAuctionV1 is Initializable {
         return usd;
     }
 
-    // 函数选择器 0xb88da759
-    // _addr.call{value: msg.value}(abi.encodeWithSignature("getVersion(uint256)", 99));
-//    function getVersion(uint256 key) external returns (string memory) {
-//        version = string.concat("MetaNFTAuctionV1:", key.toString());
-//        return "MetaNFTAuctionV1";
-//    }
-//    function getVersion(uint256 key) external {
-//        version = string.concat("MetaNFTAuctionV1:", key.toString());
-//    }
-//    function getVersion(uint256 key) external pure returns(string memory) {
-//        return string.concat("MetaNFTAuctionV1:", key.toString());
-//    }
     function getVersion() external pure returns(string memory) {
-        return "MetaNFTAuctionV1";
+        return "1.0.1";
     }
 
-    function setVersion() external {
-        version = "MetaNFTAuctionV1";
-    }
-
-//    function getVersionNumber() external pure returns (uint256) {
-//        return 1;
-//    }
-
-    // 升级函数，改变逻辑合约地址，只能由admin调用。选择器：0x0900f010
-    // UUPS中，逻辑函数中必须包含升级函数，不然就不能再升级了。
-    function upgrade(address newImplementation) external {
-        require(msg.sender == admin);
-        implementation = newImplementation;
-    }
+    // Authorizes an upgrade (only owner can call)
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
 }

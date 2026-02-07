@@ -7,8 +7,8 @@ import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transpa
 
 // Solidity tests are compatible with foundry, so they
 // use the same syntax and offer the same functionality.
-
-contract CounterTest is Test {
+// npx hardhat test contracts/CounterTest.ts
+contract CounterUpableTest is Test {
   CounterUpable counter;
 
   address private proxyAdmin = address(0xBEEF);

@@ -2,17 +2,17 @@ import { expect } from "chai";
 import { network } from "hardhat";
 // 必须使用 type
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/types";
-import CounterUpableModule from "../ignition/modules/CounterUpable.js";
-import CounterUpableUpgradeModule from "../ignition/modules/CounterUpableUpgrade.js";
+import OpzNFTAuctionModule from "../ignition/modules/OpzNFTAuction.js";
+import OpzNFTAuctionUpgradeModule from "../ignition/modules/OpzNFTAuctionUpgrade.js";
 
 // 核心：导入 TypeChain 生成的强类型（替换为你的合约名）
 // import type { CounterUpable } from "../typechain-types/contracts/CounterUpable";
 // import { CounterUpable__factory } from "../typechain-types/factories/contracts/CounterUpable";
-import type {CounterUpable, CounterUpable__factory, CounterUpableV2} from "../types/ethers-contracts/index.js";
+import type {OpzNFTAuction, CounterUpable__factory, OpzNFTAuctionV1} from "../types/ethers-contracts/index.js";
 
 const { ethers, networkHelpers, ignition } = await network.connect();
 
-// npx hardhat test test/CounterUpableProxyTest.ts
+// npx hardhat test test/OpzNFTAuctionTest.ts
 // 测试套件
 describe("MetaNFTAuctionProxy", function () {
 
@@ -21,8 +21,8 @@ describe("MetaNFTAuctionProxy", function () {
             const [owner, addr1] = await ethers.getSigners();
             // const { counter } = await ignition.deploy(CounterUpableModule);
             // const version = await counter.read.version({ account: addr1.address });
-            const deployment  = await ignition.deploy(CounterUpableModule);
-            const counterProxy = deployment.counter;
+            const deployment  = await ignition.deploy(OpzNFTAuctionModule);
+            const proxy = deployment.auction;
 
             // read 会报错，提示不存在
             // const version = await counterProxy.read.version({ account: addr1.address });
@@ -30,7 +30,7 @@ describe("MetaNFTAuctionProxy", function () {
             // console.log("version:", version);
 
             //
-            const version1 = await counterProxy.getVersion({ account: addr1.address });
+            const version1 = await proxy.getVersion({ account: addr1.address });
             console.log("version1:", version1);
 
             // TypeError: Cannot read properties of undefined (reading 'version')
@@ -39,35 +39,32 @@ describe("MetaNFTAuctionProxy", function () {
             // expect(versionCall).to.eq("1.0.0");
 
             // 将代理地址转换为合约
-            const proxyAddress = await deployment.counter.getAddress();
-            const counterProxyType: CounterUpable = await ethers.getContractAt(
-                "CounterUpable", // 合约名称
+            const proxyAddress = await deployment.auction.getAddress();
+            const proxyType: OpzNFTAuction = await ethers.getContractAt(
+                "OpzNFTAuction", // 合约名称
                 proxyAddress, // Ignition 部署的代理地址
                 owner // 可选：默认调用者
-            ) as CounterUpable;
-            const version3 = await counterProxyType.getVersion();
+            ) as OpzNFTAuction;
+            const version3 = await proxyType.getVersion();
             console.log("version3:", version3);
-
+            expect(version3).to.eq("1.0.0");
         });
     });
 
     // TIPS: 合约升级时，状态变量保持不变。
     describe("Upgrading", function () {
-        it("Should have upgraded the proxy to CounterUpableV2", async function () {
+        it("Should have upgraded the proxy to OpzNFTAuctionV1", async function () {
             const [owner, addr1] = await ethers.getSigners();
-            const deployment  = await ignition.deploy(CounterUpableUpgradeModule);
-            const proxyAddress = await deployment.counter.getAddress();
-            const counterProxyType = await ethers.getContractAt(
-                "CounterUpableV2", // 合约名称
+            const deployment  = await ignition.deploy(OpzNFTAuctionUpgradeModule);
+            const proxyAddress = await deployment.auction.getAddress();
+            const proxyType = await ethers.getContractAt(
+                "OpzNFTAuctionV1", // 合约名称
                 proxyAddress, // Ignition 部署的代理地址
                 owner // 可选：默认调用者
-            ) as CounterUpableV2;
-            const version = await counterProxyType.getVersion();
+            ) as OpzNFTAuctionV1;
+            const version = await proxyType.getVersion();
             console.log("upgrade version:", version);
-            const val = await counterProxyType.getValue();
-            console.log("upgrade val:", val);
-            const name = await counterProxyType.name();
-            console.log("upgrade new name:", name);
+            expect(version).to.eq("1.0.1");
         });
     });
 
