@@ -98,6 +98,84 @@ async function deployCounterFixture():Promise<DeployAuctionFixture> {
     // return { auctionProxy, auctionV1, auctionV2, nft, token, owner, addr1, addr2, addr3, addr4 };
 }
 
+// 定义 Fixture 函数。fast than beforeEach.
+// 非代理特殊配置项：
+// 1.合约构造函数注释 _disableInitializers();
+// 2.合约部署后，调用 initialize
+// 3.注释测试套件 Upgrading
+// async function deployCounterFixture():Promise<DeployAuctionFixture> {
+//     // owner    部署合约
+//     // 账户1      拍卖 TOKEN		    拍卖者
+//     // 账户2      使用 USDC 竞拍	    流标
+//     // 账户3      使用 ETH 竞拍		中标
+//     // 账户4      使用 ETH OR USDC 竞拍，但低于最高出价者
+//     const [owner, addr1, addr2, addr3, addr4] = await ethers.getSigners();
+//     const zeroAddress = ethers.ZeroAddress; // 零地址（示例）
+//
+//     // 部署NFT
+//     const nft = await ethers.deployContract("OpzNFT", []);
+//     // 给用户1铸造一个 NFT
+//     await nft.mint(addr1.address, 1n);
+//
+//     // 部署TOKEN
+//     const token = await ethers.deployContract("OpzToken", []);
+//     // 给用户2铸造一些 Token，如何切换到用户2呢？铸造函数只能是调用者。 TODO
+//     // await token.mint(1000n);
+//     // await token.transfer(addr2.address, 1000n);
+//
+//     // const auctionV1 = await ethers.deployContract("MetaNFTAuctionV1");
+//     // 切换到账户1，将 NFT 1 授权给拍卖合约地址
+//     // await nft.connect(addr1).approve(auctionV1.getAddress(), 1n);
+//
+//     // 部署 AUCTION PROXY
+//     // const deployment  = await ignition.deploy(OpzNFTAuctionModule);
+//     // const proxy = deployment.auction;
+//     //
+//     // // 将代理地址转换为合约
+//     // const proxyAddress = await deployment.auction.getAddress();
+//     // const auctionV1: OpzNFTAuction = await ethers.getContractAt(
+//     //     "OpzNFTAuction", // 合约名称
+//     //     proxyAddress, // Ignition 部署的代理地址
+//     //     owner // 可选：默认调用者
+//     // ) as OpzNFTAuction;
+//
+//     // 部署 AUCTION NO PROXY
+//     const auctionV1 = await ethers.deployContract("OpzNFTAuction");
+//     await auctionV1.initialize();   // must call
+//
+//     console.log("zeroAddress：", zeroAddress);
+//     console.log("auctionV1 owner addr：", await auctionV1.owner());
+//     console.log("auctionV1 addr：", await auctionV1.getAddress());
+//     console.log("nft addr：", await nft.getAddress());
+//     console.log("token addr：", await token.getAddress());
+//     // 每个测试地址，默认 10000 ETH
+//     console.log("owner addr：", await owner.getAddress());
+//     console.log("addr1 addr：", await addr1.getAddress(), ", balance:", await ethers.provider.getBalance(addr1));
+//     console.log("addr2 addr：", await addr2.getAddress());
+//     console.log("addr3 addr：", await addr3.getAddress());
+//     console.log("addr4 addr：", await addr4.getAddress());
+//
+//     // 奇怪，每次部署时，合约地址应该是变化的啊，为什么不变呢？ TODO
+//     // zeroAddress： 0x0000000000000000000000000000000000000000
+//     // auctionV1 owner addr： 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+//     // auctionV1 addr： 0x5FC8d32690cc91D4c39d9d3abcBD16989F875707
+//     // nft addr： 0x5FbDB2315678afecb367f032d93F642f64180aa3
+//     // owner addr： 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+//     // token addr： 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+//     // addr1 addr： 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 , balance: 10000000000000000000000n
+//     // addr2 addr： 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
+//     // addr3 addr： 0x90F79bf6EB2c4f870365E785982E1f101E93b906
+//
+//     return { auctionV1, nft, token, owner, addr1, addr2, addr3, addr4 };
+//
+//     // const auctionV2 = await ethers.deployContract("MetaNFTAuctionV2");
+//     //
+//     // // 代理，使用逻辑合约V1部署
+//     // const auctionProxy = await ethers.deployContract("MetaNFTAuctionProxy", [await auctionV1.getAddress()]);
+//     //
+//     // return { auctionProxy, auctionV1, auctionV2, nft, token, owner, addr1, addr2, addr3, addr4 };
+// }
+
 // npx hardhat test test/OpzNFTAuctionTest.ts
 // npx hardhat test test/OpzNFTAuctionTest.ts --coverage
 // REPORT_GAS=true npx hardhat test test/OpzNFTAuctionTest.ts

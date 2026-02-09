@@ -119,7 +119,7 @@ contract OpzNFTAuction is
         uint256 startingPriceInDollar,
         uint256 duration,
         address paymentToken
-    ) external onlyOwner {
+    ) external virtual onlyOwner {
         require(nft != address(0), "invalid nft");
         require(duration >= 120, "duration is greater than 120 second");
         require(paymentToken != address(0), "invalid payment token");
@@ -147,7 +147,7 @@ contract OpzNFTAuction is
      * @dev 买家竞价
      * @param auctionId_ 竞价的拍品
      */
-    function bid(uint256 auctionId_) external payable {
+    function bid(uint256 auctionId_) external payable virtual {
         Auction storage auction = auctions[auctionId_];
         // 竞拍者授权合约的 token 额度
         uint256 allowance = auction.paymentToken.allowance(msg.sender, address(this));
@@ -214,7 +214,7 @@ contract OpzNFTAuction is
      * @dev 卖家取款
      * @param auctionId_ 竞价的拍品
      */
-    function withdraw(uint256 auctionId_) external returns (uint256) {
+    function withdraw(uint256 auctionId_) external virtual returns (uint256) {
         uint256 bal;
         uint kind;
         Auction storage auction = auctions[auctionId_];
@@ -264,7 +264,7 @@ contract OpzNFTAuction is
     /**
      * @dev 结束拍卖
      */
-    function endBidding(uint256 auctionId_) external onlyOwner{
+    function endBidding(uint256 auctionId_) external virtual onlyOwner {
         Auction storage auction = auctions[auctionId_];
         require(!auction.end, "ended");
         auction.end = true;
@@ -299,7 +299,7 @@ contract OpzNFTAuction is
     /**
      * @dev 使用 Chainlink 的 feedData 预言机，获取 ERC20 和以太坊到美元的价格。
      */
-    function getPriceInDollar(uint256 bidMethod) public pure returns (uint256) {
+    function getPriceInDollar(uint256 bidMethod) public pure virtual returns (uint256) {
         if (bidMethod == 1) {
             // eth, 2289.12$, 1000$ = 0.5
             return uint256(228912670662);
@@ -313,14 +313,14 @@ contract OpzNFTAuction is
      * @dev 8位小数的usd
      * 2000000000,18,99971000
      */
-    function _toUsd(uint256 amount, uint256 amountDecimals, uint256 price) internal pure returns (uint256) {
+    function _toUsd(uint256 amount, uint256 amountDecimals, uint256 price) internal pure virtual returns (uint256) {
         // amount is in smallest units; convert to USD using price decimals.
         uint256 scale = 10 ** amountDecimals;
         uint256 usd = (amount * price) / scale;
         return usd;
     }
 
-    function getVersion() external pure returns(string memory) {
+    function getVersion() external pure virtual returns(string memory) {
         return "1.0.0";
     }
 
