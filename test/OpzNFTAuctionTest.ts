@@ -4,6 +4,7 @@ import { network } from "hardhat";
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/types";
 import OpzNFTAuctionModule from "../ignition/modules/OpzNFTAuction.js";
 import OpzNFTAuctionUpgradeModule from "../ignition/modules/OpzNFTAuctionUpgrade.js";
+import OpzNFTAuctionUpgradeV2Module from "../ignition/modules/OpzNFTAuctionUpgradeV2.js";
 
 // 核心：导入 TypeChain 生成的强类型（替换为你的合约名）
 // import type { CounterUpable } from "../typechain-types/contracts/CounterUpable";
@@ -12,8 +13,10 @@ import type {
     OpzNFTAuction,
     CounterUpable__factory,
     OpzNFTAuctionV1,
+    OpzNFTAuctionV2,
     MetaNFTAuctionV1, MetaNFT, USDC, OpzToken, OpzNFT
 } from "../types/ethers-contracts/index.js";
+import OpzNFTAuctionUpgradeV2 from "../ignition/modules/OpzNFTAuctionUpgradeV2.js";
 
 const { ethers, networkHelpers, ignition } = await network.connect();
 
@@ -87,6 +90,7 @@ async function deployCounterFixture():Promise<DeployAuctionFixture> {
     // addr1 addr： 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 , balance: 10000000000000000000000n
     // addr2 addr： 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
     // addr3 addr： 0x90F79bf6EB2c4f870365E785982E1f101E93b906
+    // addr4 addr： 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65
 
     return { auctionV1, nft, token, owner, addr1, addr2, addr3, addr4 };
 
@@ -825,7 +829,7 @@ describe("OpzNFTAuctionProxy", function () {
     });
 
     // TIPS: 合约升级时，状态变量保持不变。
-    describe("Upgrading", function () {
+    describe("UpgradingV1", function () {
         it("Should have upgraded the proxy to OpzNFTAuctionV1", async function () {
             const [owner, addr1] = await ethers.getSigners();
             const deployment  = await ignition.deploy(OpzNFTAuctionUpgradeModule);
@@ -838,6 +842,23 @@ describe("OpzNFTAuctionProxy", function () {
             const version = await proxyType.getVersion();
             console.log("upgrade version:", version);
             expect(version).to.eq("1.0.1");
+        });
+    });
+
+    // TIPS: 合约升级时，状态变量保持不变。
+    describe("UpgradingV1", function () {
+        it("Should have upgraded the proxy to OpzNFTAuctionV2", async function () {
+            const [owner, addr1] = await ethers.getSigners();
+            const deployment  = await ignition.deploy(OpzNFTAuctionUpgradeV2Module);
+            const proxyAddress = await deployment.auction.getAddress();
+            const proxyType = await ethers.getContractAt(
+                "OpzNFTAuctionV2", // 合约名称
+                proxyAddress, // Ignition 部署的代理地址
+                owner // 可选：默认调用者
+            ) as OpzNFTAuctionV2;
+            const version = await proxyType.getVersion();
+            console.log("upgrade version:", version);
+            expect(version).to.eq("1.0.2");
         });
     });
 

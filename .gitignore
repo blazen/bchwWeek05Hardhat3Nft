@@ -25,3 +25,5 @@
 # REMIX
 .deps
 .states
+.deploys
+/ignition

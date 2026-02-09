@@ -4,6 +4,8 @@ import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 import OpzNFTAuctionModule from "./OpzNFTAuction.js";
 
 // npx hardhat ignition deploy ./ignition/modules/OpzNFTAuctionUpgrade.ts
+// npx hardhat ignition deploy ./ignition/modules/OpzNFTAuctionUpgrade.ts  --network localhost
+// npx hardhat ignition deploy ./ignition/modules/OpzNFTAuctionUpgrade.ts --network sepolia --verify
 const opzNFTAuctionUpgradeModule = buildModule(
     "OpzNFTAuctionUpgradeModule",
     (m) => {
@@ -12,7 +14,8 @@ const opzNFTAuctionUpgradeModule = buildModule(
         // 加载部署脚本
         const { proxyAdmin, proxy } = m.useModule(OpzNFTAuctionModule);
         // 部署新版本
-        const auctionV1 = m.contract("OpzNFTAuctionV1");
+        const auctionName = "OpzNFTAuctionV1";
+        const auctionV1 = m.contract(auctionName);
         // 合约升级后，调用的函数。
         // const encodedFunctionCall = m.encodeFunctionCall(counterV2, "setName", [
         //     "hello v2",
@@ -23,7 +26,7 @@ const opzNFTAuctionUpgradeModule = buildModule(
             from: proxyAdminOwner,
         });
 
-        const auction = m.contractAt("OpzNFTAuctionV1", proxy, {
+        const auction = m.contractAt(auctionName, proxy, {
             id: "OpzNFTAuctionV1AtProxy",
         });
 

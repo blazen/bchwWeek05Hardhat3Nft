@@ -1,6 +1,9 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 // npx hardhat ignition deploy ./ignition/modules/OpzNFTAuction.ts
+// npx hardhat ignition deploy ./ignition/modules/OpzNFTAuction.ts  --network localhost
+// npx hardhat ignition deploy ./ignition/modules/OpzNFTAuction.ts  --network sepolia --verify
+// npx hardhat ignition status chain-31337
 const opzNFTAuctionProxyModule = buildModule("OpzNFTAuctionProxyModule", (m) => {
     // 代理升级管理员
     const proxyAdminOwner = m.getAccount(0);

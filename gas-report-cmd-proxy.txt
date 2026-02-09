@@ -70,7 +70,7 @@ upgrade version: 1.0.1
 ║ upgradeAndCall  │ 37794           │ 37794   │ 37794  │ 37794 │ 2                                      ║
 ╚═════════════════╧═════════════════╧═════════╧════════╧═══════╧════════════════════════════════════════╝
 ╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗
-║ @openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol:TransparentUpgradeableProxy ║
+║ @openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol:TransparentUpgradeableProxy ║			# 这里为何没有 fallback ？ 
 ╟─────────────────┬─────────────────┬───────────────────────────────────────────────────────────────────╢
 ║ Deployment Cost │ Deployment Size │                                                                   ║
 ╟─────────────────┼─────────────────┤                                                                   ║
