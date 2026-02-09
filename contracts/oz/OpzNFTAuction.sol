@@ -100,6 +100,7 @@ contract OpzNFTAuction is
     }
 
     function initialize() external initializer {
+        __Ownable_init(msg.sender); // Is this a must?
     }
 
     /**

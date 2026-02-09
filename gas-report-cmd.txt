@@ -1,0 +1,124 @@
+No contracts to compile
+Running Mocha tests
+
+
+  OpzNFTAuctionProxy
+    Proxy interaction
+zeroAddress： 0x0000000000000000000000000000000000000000
+auctionV1 owner addr： 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+auctionV1 addr： 0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9
+nft addr： 0x5FbDB2315678afecb367f032d93F642f64180aa3
+token addr： 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+owner addr： 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+addr1 addr： 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 , balance: 10000000000000000000000n
+addr2 addr： 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
+addr3 addr： 0x90F79bf6EB2c4f870365E785982E1f101E93b906
+addr4 addr： 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65
+version3: 1.0.0
+      √ Should be usable via proxy (178ms)
+Method start: 218576
+      √ Should compare gas costs
+    Deployment
+      √ Should account2 have nft 1
+      √ Should auction‘s auctionId is 0
+    Start
+      √ Should allow the owner to start and revert for non-owners
+      √ Should revert when nft is zero address
+      √ Should revert where duration < 120
+      √ Should revert when token is zero address
+      √ Should auctionV1 is 1 and emit StartBid when start success
+      √ Should manually set auction is ended by owner
+      √ Should revert when bid an auction of ended
+    bidToken
+      √ Should auctionV1 have approved by bidder
+      √ Should bid failed when price lower than starting price
+      √ Should bid success
+      √ Should bid failed when auction is end
+    bidEth
+      √ Should bid eth>0
+      √ Should bid failed when price lower than starting price
+      √ Should bid success
+      √ Should bid failed when price lower than starting price
+      √ Should bid failed when auction is end
+    withdrawSuccess
+highestBid: 1000000000000000000n
+      √ Should addr3 get NFT 1 success
+      √ Should addr1 get bid success, and not owner of NFT 1
+      √ Should addr2 get the amount of failed bidding success
+    bidSuccessByETHAndWithdraw
+      √ Should addr2 get NFT 1 success
+      √ Should addr1 get bid success, and not owner of NFT 1
+balanceBefore: 9998999858171509741756n , balance: 9999999806163466310156n , gas: -52008043431600n
+      √ Should addr3 get the amount of failed bidding success
+    withdrawFail
+      √ Should revoke approve success
+    Upgrading
+upgrade version: 1.0.1
+      √ Should have upgraded the proxy to OpzNFTAuctionV1 (130ms)
+
+
+  28 passing (710ms)
+
+╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                         Gas Usage Statistics                                          ║
+╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ @openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol:ProxyAdmin                                   ║
+╟─────────────────┬─────────────────┬─────────┬────────┬───────┬────────────────────────────────────────╢
+║ Function name   │ Min             │ Average │ Median │ Max   │ #calls                                 ║
+╟─────────────────┼─────────────────┼─────────┼────────┼───────┼────────────────────────────────────────╢
+║ upgradeAndCall  │ 37794           │ 37794   │ 37794  │ 37794 │ 2                                      ║
+╚═════════════════╧═════════════════╧═════════╧════════╧═══════╧════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ @openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol:TransparentUpgradeableProxy ║
+╟─────────────────┬─────────────────┬───────────────────────────────────────────────────────────────────╢
+║ Deployment Cost │ Deployment Size │                                                                   ║
+╟─────────────────┼─────────────────┤                                                                   ║
+║ 692804          │ 3687            │                                                                   ║
+╚═════════════════╧═════════════════╧═══════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ contracts/oz/OpzNFT.sol:OpzNFT                                                                        ║
+╟─────────────────┬─────────────────┬─────────┬────────┬───────┬────────────────────────────────────────╢
+║ Function name   │ Min             │ Average │ Median │ Max   │ #calls                                 ║
+╟─────────────────┼─────────────────┼─────────┼────────┼───────┼────────────────────────────────────────╢
+║ approve         │ 26545           │ 43141   │ 48673  │ 48673 │ 4                                      ║
+║ getApproved     │ 26021           │ 26021   │ 26021  │ 26021 │ 1                                      ║
+║ mint            │ 73696           │ 73696   │ 73696  │ 73696 │ 1                                      ║
+║ ownerOf         │ 23864           │ 23864   │ 23864  │ 23864 │ 5                                      ║
+╟─────────────────┼─────────────────┼─────────┴────────┴───────┴────────────────────────────────────────╢
+║ Deployment Cost │ Deployment Size │                                                                   ║
+╟─────────────────┼─────────────────┤                                                                   ║
+║ 1078178         │ 4977            │                                                                   ║
+╚═════════════════╧═════════════════╧═══════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ contracts/oz/OpzNFTAuction.sol:OpzNFTAuction                                                          ║
+╟─────────────────┬─────────────────┬───────────────────────────────────────────────────────────────────╢
+║ Deployment Cost │ Deployment Size │                                                                   ║
+╟─────────────────┼─────────────────┤                                                                   ║
+║ 1806910         │ 8242            │                                                                   ║
+╚═════════════════╧═════════════════╧═══════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ contracts/oz/OpzNFTAuctionV2.sol:OpzNFTAuctionV1                                                      ║
+╟─────────────────┬─────────────────┬───────────────────────────────────────────────────────────────────╢
+║ Deployment Cost │ Deployment Size │                                                                   ║
+╟─────────────────┼─────────────────┤                                                                   ║
+║ 1786159         │ 8146            │                                                                   ║
+╚═════════════════╧═════════════════╧═══════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ contracts/oz/OpzToken.sol:OpzToken                                                                    ║
+╟─────────────────┬─────────────────┬─────────┬────────┬───────┬────────────────────────────────────────╢
+║ Function name   │ Min             │ Average │ Median │ Max   │ #calls                                 ║
+╟─────────────────┼─────────────────┼─────────┼────────┼───────┼────────────────────────────────────────╢
+║ allowance       │ 24564           │ 24564   │ 24564  │ 24564 │ 4                                      ║
+║ approve         │ 29241           │ 43489   │ 46341  │ 46341 │ 6                                      ║
+║ balanceOf       │ 24046           │ 24050.5 │ 24046  │ 24058 │ 8                                      ║
+║ mint            │ 36398           │ 59196   │ 62048  │ 70598 │ 6                                      ║
+╟─────────────────┼─────────────────┼─────────┴────────┴───────┴────────────────────────────────────────╢
+║ Deployment Cost │ Deployment Size │                                                                   ║
+╟─────────────────┼─────────────────┤                                                                   ║
+║ 626880          │ 2876            │                                                                   ║
+╚═════════════════╧═════════════════╧═══════════════════════════════════════════════════════════════════╝
+
+
+28 passing (28 mocha)
+
