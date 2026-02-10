@@ -126,7 +126,7 @@ OpzNFTAuctionUpgradeV2Module#OpzNFTAuctionV2AtProxy - 0xBDd0ae6A19E0A5D4e277A6d9
 ### 4.REMIX 测试 SEPOLIA 合约功能
 
 ### 测试步骤：
-- 1.测试找哪个好准备
+- 1.测试号、额度准备
   - account1：作为 owner 部署合约， 作为拍卖者
   - account2：竞标者，使用 USDC 竞拍，流标。当前持有 20 USDC。		
   - account3：竞标者，使用 ETH 竞拍，中标
@@ -189,7 +189,7 @@ OpzNFTAuctionUpgradeV2Module#OpzNFTAuctionV2AtProxy - 0xBDd0ae6A19E0A5D4e277A6d9
 
 ### 3.1账号3 ETH竞标成功
 
-![`Remix`演示](./imgs/3.1账号3 ETH竞标成功.png)
+![`Remix`演示](./imgs/3.1账号3ETH竞标成功.png)
 
 ### 4.1账号3取款：拍卖未结束，无法取款
 
@@ -239,4 +239,3 @@ OpzNFTAuctionUpgradeV2Module#OpzNFTAuctionV2AtProxy - 0xBDd0ae6A19E0A5D4e277A6d9
 - openzeppelin 代理升级 hardhat 插件 https://docs.openzeppelin.com/upgrades-plugins/hardhat-upgrades
 - mocha https://mochajs.org/getting-started/
 - chai https://www.chaijs.com/api/bdd/
-- 
