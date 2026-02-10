@@ -27,3 +27,4 @@
 .states
 .deploys
 /ignition
+.env
