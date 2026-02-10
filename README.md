@@ -123,6 +123,9 @@ OpzNFTAuctionUpgradeV2Module#OpzNFTAuctionV2 - 0x7982B305E5376D5A6CeDeE0B0bB1532
 OpzNFTAuctionUpgradeV2Module#OpzNFTAuctionV2AtProxy - 0xBDd0ae6A19E0A5D4e277A6d9200aCd97c3c3DA98
 ```
 
+- 拍卖合约 --verify sepolia 地址
+- https://repo.sourcify.dev/11155111/0xBDd0ae6A19E0A5D4e277A6d9200aCd97c3c3DA98
+
 ### 4.REMIX 测试 SEPOLIA 合约功能
 
 ### 测试步骤：
