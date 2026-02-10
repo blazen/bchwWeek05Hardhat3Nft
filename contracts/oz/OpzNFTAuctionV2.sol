@@ -10,6 +10,8 @@ import "./OpzNFTAuctionV1.sol";
  * @notice 继承 Initializable 实现 initialize。构造函数中调用 _disableInitializers(); 确保逻辑合约只能通过代理调用。
  * @notice 继承 UUPSUpgradeable 实现 _authorizeUpgrade 添加 onlyOwner，仅支持管理员升级。以便在 @openzeppelin/contracts-upgradeable 支持 hardhat3 后部署升级。
  * @notice The @openzeppelin/hardhat-upgrades plugin (v3.9.1) is currently incompatible with Hardhat v3.0.6
+ * @notice V1：重写版本函数，测试合约升级
+ * @notice V2：重写汇率方法，改为 chainlink 实时查询 ETH\USDC 的汇率。
  */
 contract OpzNFTAuctionV2 is OpzNFTAuctionV1
 {
