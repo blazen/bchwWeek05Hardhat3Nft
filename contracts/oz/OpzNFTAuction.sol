@@ -325,6 +325,6 @@ contract OpzNFTAuction is
     }
 
     // Authorizes an upgrade (only owner can call)
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+    function _authorizeUpgrade(address newImplementation) internal override virtual onlyOwner {}
 
 }

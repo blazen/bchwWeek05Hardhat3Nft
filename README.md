@@ -30,6 +30,7 @@
 - 10.部署ignition警告
   ![`Remix`演示](./imgs/部署ignition警告.png)
 - 11.分析函数 GAS 消耗情况，并能够给出优化方案的工具呢？
+- 12.ignition --gas-stats 代理部署时，没有各个函数的gas。非代理部署时有。
 
 ## 环境要求
 - Node.js >= 22.0.0

@@ -14,6 +14,10 @@ import "./OpzNFTAuction.sol";
  */
 contract OpzNFTAuctionV1 is OpzNFTAuction
 {
+
+    function initializeV1() external {
+    }
+
     function getVersion() external pure override virtual returns(string memory) {
         return "1.0.1";
     }

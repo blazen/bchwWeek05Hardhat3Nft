@@ -14,24 +14,18 @@ import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.s
 // Solidity tests are compatible with foundry, so they
 // use the same syntax and offer the same functionality.
 // npx hardhat test contracts/oz/CounterTest.ts
-contract OpzNFTAuctionTest is Test {
-//    address private proxyAdmin = address(0xBEEF);
-    OpzNFTAuction auction;
-    ProxyAdmin proxyAdmin;
-    TransparentUpgradeableProxy proxy;
-//    ERC1967Proxy proxy;
-
+contract OpzNFTAuctionUUPSTest is Test {
     address public proxyAdminAddr = address(this);
+    address public user = address(0x123);
+    OpzNFTAuction auction;
+    ERC1967Proxy proxy;
 
     // is called before each test execution
     function setUp() public {
         OpzNFTAuction impl = new OpzNFTAuction();
-        proxyAdmin = new ProxyAdmin(proxyAdminAddr);
         bytes memory initData = abi.encodeCall(OpzNFTAuction.initialize, ());
-        // 透明代理
-        proxy = new TransparentUpgradeableProxy(address(impl), address(proxyAdmin), initData);
         // UUPS
-//        ERC1967Proxy proxy = new ERC1967Proxy(address(impl), initData);
+        proxy = new ERC1967Proxy(address(impl), initData);
         auction = OpzNFTAuction(address(proxy));
     }
 
@@ -45,25 +39,15 @@ contract OpzNFTAuctionTest is Test {
     // 测试合约升级
     function test_update() public {
         OpzNFTAuctionV1 impl = new OpzNFTAuctionV1();
-
-////        bytes memory initData = abi.encodeCall(TransparentUpgradeableProxy._dispatchUpgradeToAndCall, ());
-//        bytes memory initData = [0];
-//        (bool success, bytes memory data) = proxy.call{value: msg.value}(
-//            abi.encodeWithSignature("_dispatchUpgradeToAndCall()", impl, initData)
-//        );
-
-//        (bool success, bytes memory data) = proxy.call{value: msg.value}(
-//            abi.encodeWithSignature("_proxyAdmin()")
-//        );
-//        address proxyAdminAddr = abi.decode(data, (address));
-//        ProxyAdmin pa = ProxyAdmin(proxyAdminAddr);
-
         bytes memory initData = abi.encodeCall(OpzNFTAuctionV1.initializeV1, ());
-        ITransparentUpgradeableProxy proxyImpl = ITransparentUpgradeableProxy(address(proxy));
-        proxyAdmin.upgradeAndCall(proxyImpl, address(impl), initData);
-        OpzNFTAuctionV1 auctionV1 = OpzNFTAuctionV1(address(proxy));
-        assertEq(auctionV1.getVersion(), "1.0.1");
 
+        vm.prank(user);
+        vm.expectRevert("OwnableUnauthorizedAccount(0x0000000000000000000000000000000000000123)");
+        auction.upgradeToAndCall(address(impl), initData);
+
+        vm.prank(proxyAdminAddr);
+        auction.upgradeToAndCall(address(impl), initData);
+        assertEq(auction.getVersion(), "1.0.1");
     }
 
 }

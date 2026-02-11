@@ -7,6 +7,8 @@ import {Test} from "forge-std/Test.sol";
 // Solidity tests are compatible with foundry, so they
 // use the same syntax and offer the same functionality.
 
+// npx hardhat test solidity contracts/Counter.t.sol
+// npx hardhat test contracts/Counter.t.sol
 contract CounterTest is Test {
   Counter counter;
 
